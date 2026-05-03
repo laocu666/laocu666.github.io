@@ -6,19 +6,21 @@
     <title>CMD Pro | 常用命令行汇总</title>
     <style>
         :root {
-            --bg: #f4f7f6;
+            --bg: #f0f2f5;
             --card-bg: #ffffff;
             --primary: #2d3436;
             --accent: #0984e3;
-            --text: #636e72;
-            --code-bg: #2d3436;
-            --code-text: #fab1a0;
+            --script-accent: #6c5ce7;
+            --update-accent: #00b894;
+            --firewall-accent: #d63031; /* 防火墙使用警告红 */
+            --code-bg: #1e1e1e;
+            --code-text: #dcdcdc;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--primary);
             line-height: 1.6;
@@ -27,19 +29,32 @@
 
         header {
             text-align: center;
-            padding: 40px 0;
+            padding: 30px 0;
         }
 
-        header h1 {
-            font-size: 2rem;
-            letter-spacing: -1px;
+        header h1 { font-size: 2rem; letter-spacing: -1px; margin-bottom: 5px; color: #2d3436; }
+        header p { color: #636e72; font-size: 0.9rem; }
+
+        .search-container { text-align: center; margin: 20px 0 40px; }
+
+        #searchInput {
+            width: 90%;
+            max-width: 500px;
+            padding: 12px 25px;
+            border: 2px solid #dfe6e9;
+            border-radius: 10px;
+            outline: none;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+
+        #searchInput:focus { border-color: var(--accent); }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
         }
 
@@ -47,70 +62,46 @@
             background: var(--card-bg);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+        .card.script { border-top-color: var(--script-accent); }
+        .card.update { border-top-color: var(--update-accent); }
+        .card.firewall { border-top-color: var(--firewall-accent); }
 
         .card h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--accent);
-            border-bottom: 2px solid var(--bg);
-            padding-bottom: 8px;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .cmd-item {
-            margin-bottom: 12px;
-        }
-
-        .cmd-item p {
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
+        .cmd-item { margin-bottom: 15px; }
+        .cmd-item p { font-size: 0.85rem; font-weight: bold; color: #636e72; margin-bottom: 5px; }
 
         code {
             display: block;
             background: var(--code-bg);
             color: var(--code-text);
-            padding: 8px 12px;
+            padding: 12px;
             border-radius: 6px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
             cursor: pointer;
             position: relative;
+            word-break: break-all;
         }
+
+        code:hover { opacity: 0.9; }
 
         code::after {
-            content: "点击复制";
+            content: "COPY";
             position: absolute;
             right: 10px;
-            font-size: 0.7rem;
-            opacity: 0.5;
-        }
-
-        /* 搜索框样式 */
-        .search-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        #searchInput {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px 20px;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #searchInput:focus {
-            border-color: var(--accent);
+            bottom: 5px;
+            font-size: 0.6rem;
+            color: #888;
         }
 
         @media (max-width: 600px) {
@@ -121,88 +112,96 @@
 <body>
 
 <header>
-    <h1>Terminal Cheat Sheet</h1>
-    <p>简洁 · 高效 · 常用命令快速查询</p>
+    <h1>Terminal Toolbox</h1>
+    <p>⚡ 快速访问您的常用命令行脚本</p>
 </header>
 
 <div class="search-container">
-    <input type="text" id="searchInput" placeholder="搜索命令或功能..." onkeyup="filterCommands()">
+    <input type="text" id="searchInput" placeholder="搜索命令... (如: ufw, yum, install)" onkeyup="filterCommands()">
 </div>
 
 <div class="container" id="cmdContainer">
-    <div class="card">
-        <h2>Git 版本控制</h2>
+    
+    <div class="card firewall">
+        <h2>🛡️ 防火墙控制 (UFW/Firewalld)</h2>
         <div class="cmd-item">
-            <p>查看状态</p>
-            <code onclick="copyText(this)">git status</code>
+            <p>UFW: 开放 80/443 端口</p>
+            <code onclick="copyText(this)">ufw allow 80/tcp && ufw allow 443/tcp</code>
         </div>
         <div class="cmd-item">
-            <p>提交所有更改</p>
-            <code onclick="copyText(this)">git commit -am "update"</code>
+            <p>UFW: 启用/查看状态</p>
+            <code onclick="copyText(this)">ufw enable && ufw status</code>
         </div>
         <div class="cmd-item">
-            <p>推送至远程</p>
-            <code onclick="copyText(this)">git push origin main</code>
+            <p>Firewalld: 永久开放端口</p>
+            <code onclick="copyText(this)">firewall-cmd --permanent --add-port=80/tcp && firewall-cmd --reload</code>
+        </div>
+        <div class="cmd-item">
+            <p>Firewalld: 查看所有规则</p>
+            <code onclick="copyText(this)">firewall-cmd --list-all</code>
+        </div>
+    </div>
+
+    <div class="card script">
+        <h2>🚀 面板一键安装</h2>
+        <div class="cmd-item">
+            <p>s-ui 安装</p>
+            <code onclick="copyText(this)">bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)</code>
+        </div>
+        <div class="cmd-item">
+            <p>3x-ui 安装</p>
+            <code onclick="copyText(this)">bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</code>
+        </div>
+    </div>
+
+    <div class="card update">
+        <h2>🔄 系统更新维护</h2>
+        <div class="cmd-item">
+            <p>Debian/Ubuntu 更新</p>
+            <code onclick="copyText(this)">apt update && apt upgrade -y</code>
+        </div>
+        <div class="cmd-item">
+            <p>CentOS/RHEL 更新</p>
+            <code onclick="copyText(this)">yum update -y || dnf update -y</code>
         </div>
     </div>
 
     <div class="card">
-        <h2>Docker 容器</h2>
+        <h2>📊 系统信息查询</h2>
         <div class="cmd-item">
-            <p>查看运行中的容器</p>
-            <code onclick="copyText(this)">docker ps</code>
+            <p>查看所有监听端口</p>
+            <code onclick="copyText(this)">netstat -tunlp</code>
         </div>
         <div class="cmd-item">
-            <p>停止所有容器</p>
-            <code onclick="copyText(this)">docker stop $(docker ps -aq)</code>
-        </div>
-    </div>
-
-    <div class="card">
-        <h2>Linux 系统</h2>
-        <div class="cmd-item">
-            <p>查看磁盘占用</p>
-            <code onclick="copyText(this)">df -h</code>
-        </div>
-        <div class="cmd-item">
-            <p>实时进程监控</p>
-            <code onclick="copyText(this)">htop</code>
+            <p>查看内存使用 (MB)</p>
+            <code onclick="copyText(this)">free -m</code>
         </div>
     </div>
 
-    <div class="card">
-        <h2>网络工具</h2>
-        <div class="cmd-item">
-            <p>查看端口占用</p>
-            <code onclick="copyText(this)">lsof -i :8080</code>
-        </div>
-        <div class="cmd-item">
-            <p>测试网络连接</p>
-            <code onclick="copyText(this)">ping google.com</code>
-        </div>
-    </div>
 </div>
 
 <script>
-    // 点击复制功能
     function copyText(element) {
-        const text = element.innerText.replace("点击复制", "").trim();
-        navigator.clipboard.writeText(text).then(() => {
-            const originalText = element.innerText;
-            element.innerText = "已复制！";
-            element.style.color = "#55efc4";
-            setTimeout(() => {
-                element.innerText = originalText;
-                element.style.color = "";
-            }, 1000);
-        });
+        const text = element.innerText.replace("COPY", "").trim();
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        const originalText = element.innerHTML;
+        element.innerText = "已复制成功！";
+        element.style.color = "#55efc4";
+        setTimeout(() => {
+            element.innerHTML = originalText;
+            element.style.color = "";
+        }, 1000);
     }
 
-    // 简单的搜索过滤
     function filterCommands() {
         let input = document.getElementById('searchInput').value.toLowerCase();
         let cards = document.getElementsByClassName('card');
-        
         for (let card of cards) {
             let text = card.innerText.toLowerCase();
             card.style.display = text.includes(input) ? "" : "none";
