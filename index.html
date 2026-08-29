@@ -1,213 +1,126 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMD Pro | 常用命令行汇总</title>
-    <style>
-        :root {
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --primary: #2d3436;
-            --accent: #0984e3;
-            --script-accent: #6c5ce7;
-            --update-accent: #00b894;
-            --firewall-accent: #d63031; /* 防火墙使用警告红 */
-            --code-bg: #1e1e1e;
-            --code-text: #dcdcdc;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>左右分栏导航网页</title>
+  <style>
+    /* 基础重置 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--primary);
-            line-height: 1.6;
-            padding: 20px;
-        }
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #f1f5f9;
+    }
 
-        header {
-            text-align: center;
-            padding: 30px 0;
-        }
+    /* 左侧导航栏 */
+    .sidebar {
+      width: 240px;
+      height: 100%;
+      background-color: #1e293b;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
 
-        header h1 { font-size: 2rem; letter-spacing: -1px; margin-bottom: 5px; color: #2d3436; }
-        header p { color: #636e72; font-size: 0.9rem; }
+    .sidebar-header {
+      padding: 24px 20px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #334155;
+      text-align: center;
+    }
 
-        .search-container { text-align: center; margin: 20px 0 40px; }
+    .nav-list {
+      list-style: none;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-        #searchInput {
-            width: 90%;
-            max-width: 500px;
-            padding: 12px 25px;
-            border: 2px solid #dfe6e9;
-            border-radius: 10px;
-            outline: none;
-            font-size: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+    /* 导航链接样式 */
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 15px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
 
-        #searchInput:focus { border-color: var(--accent); }
+    .nav-item a:hover {
+      background-color: #334155;
+      color: #ffffff;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
+    /* 激活选中的状态 */
+    .nav-item a.active {
+      background-color: #3b82f6;
+      color: #ffffff;
+      font-weight: 600;
+    }
 
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-top: 5px solid var(--accent);
-        }
+    /* 右侧网页展示区 */
+    .content-area {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffff;
+    }
 
-        .card.script { border-top-color: var(--script-accent); }
-        .card.update { border-top-color: var(--update-accent); }
-        .card.firewall { border-top-color: var(--firewall-accent); }
-
-        .card h2 {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .cmd-item { margin-bottom: 15px; }
-        .cmd-item p { font-size: 0.85rem; font-weight: bold; color: #636e72; margin-bottom: 5px; }
-
-        code {
-            display: block;
-            background: var(--code-bg);
-            color: var(--code-text);
-            padding: 12px;
-            border-radius: 6px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.8rem;
-            cursor: pointer;
-            position: relative;
-            word-break: break-all;
-        }
-
-        code:hover { opacity: 0.9; }
-
-        code::after {
-            content: "COPY";
-            position: absolute;
-            right: 10px;
-            bottom: 5px;
-            font-size: 0.6rem;
-            color: #888;
-        }
-
-        @media (max-width: 600px) {
-            .container { grid-template-columns: 1fr; }
-        }
-    </style>
+    .content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <h1>Terminal Toolbox</h1>
-    <p>⚡ 快速访问您的常用命令行脚本</p>
-</header>
-
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="搜索命令... (如: ufw, yum, install)" onkeyup="filterCommands()">
-</div>
-
-<div class="container" id="cmdContainer">
-    
-    <div class="card firewall">
-        <h2>🛡️ 防火墙控制 (UFW/Firewalld)</h2>
-        <div class="cmd-item">
-            <p>UFW: 开放 80/443 端口</p>
-            <code onclick="copyText(this)">ufw allow 80/tcp && ufw allow 443/tcp</code>
-        </div>
-        <div class="cmd-item">
-            <p>UFW: 启用/查看状态</p>
-            <code onclick="copyText(this)">ufw enable && ufw status</code>
-        </div>
-        <div class="cmd-item">
-            <p>Firewalld: 永久开放端口</p>
-            <code onclick="copyText(this)">firewall-cmd --permanent --add-port=80/tcp && firewall-cmd --reload</code>
-        </div>
-        <div class="cmd-item">
-            <p>Firewalld: 查看所有规则</p>
-            <code onclick="copyText(this)">firewall-cmd --list-all</code>
-        </div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      系统导航
     </div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="https://zh.wikipedia.org" target="main-frame" class="active">维基百科</a>
+      </li>
+      <li class="nav-item">
+        <a href="https://example.com" target="main-frame">示例页面</a>
+      </li>
+      <li class="nav-item">
+        <a href="https://httpbin.org" target="main-frame">接口调试页</a>
+      </li>
+      </ul>
+  </aside>
 
-    <div class="card script">
-        <h2>🚀 面板一键安装</h2>
-        <div class="cmd-item">
-            <p>s-ui 安装</p>
-            <code onclick="copyText(this)">bash <(curl -Ls https://raw.githubusercontent.com/alireza0/s-ui/master/install.sh)</code>
-        </div>
-        <div class="cmd-item">
-            <p>3x-ui 安装</p>
-            <code onclick="copyText(this)">bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</code>
-        </div>
-    </div>
+  <main class="content-area">
+    <iframe name="main-frame" class="content-frame" src="https://zh.wikipedia.org"></iframe>
+  </main>
 
-    <div class="card update">
-        <h2>🔄 系统更新维护</h2>
-        <div class="cmd-item">
-            <p>Debian/Ubuntu 更新</p>
-            <code onclick="copyText(this)">apt update && apt upgrade -y</code>
-        </div>
-        <div class="cmd-item">
-            <p>CentOS/RHEL 更新</p>
-            <code onclick="copyText(this)">yum update -y || dnf update -y</code>
-        </div>
-    </div>
+  <script>
+    const navLinks = document.querySelectorAll('.nav-item a');
 
-    <div class="card">
-        <h2>📊 系统信息查询</h2>
-        <div class="cmd-item">
-            <p>查看所有监听端口</p>
-            <code onclick="copyText(this)">netstat -tunlp</code>
-        </div>
-        <div class="cmd-item">
-            <p>查看内存使用 (MB)</p>
-            <code onclick="copyText(this)">free -m</code>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    function copyText(element) {
-        const text = element.innerText.replace("COPY", "").trim();
-        const el = document.createElement('textarea');
-        el.value = text;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-
-        const originalText = element.innerHTML;
-        element.innerText = "已复制成功！";
-        element.style.color = "#55efc4";
-        setTimeout(() => {
-            element.innerHTML = originalText;
-            element.style.color = "";
-        }, 1000);
-    }
-
-    function filterCommands() {
-        let input = document.getElementById('searchInput').value.toLowerCase();
-        let cards = document.getElementsByClassName('card');
-        for (let card of cards) {
-            let text = card.innerText.toLowerCase();
-            card.style.display = text.includes(input) ? "" : "none";
-        }
-    }
-</script>
-
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        navLinks.forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
